@@ -3,8 +3,9 @@ local Config = {}
 Config.__index = Config
 
 ---@class ConfigOpts
----@field bay { length: number, history: number }
----@field dock { length: number }
+---@field extensions? ExtensionName[]
+---@field bay? { length: number, history: number }
+---@field dock? { length: number }
 
 function Config:new()
     local instance = setmetatable({
@@ -25,6 +26,8 @@ end
 
 ---@param partial_config ConfigOpts
 function Config:load(partial_config)
+    self.opts = utils.table.merge(self.opts, partial_config)
+
     if partial_config.bay ~= nil then
         self.opts.bay = utils.table.merge(self.opts.bay, partial_config.bay)
     end
@@ -32,6 +35,7 @@ function Config:load(partial_config)
     if partial_config.dock ~= nil then
         self.opts.dock = utils.table.merge(self.opts.dock, partial_config.dock)
     end
+
 end
 
 return Config

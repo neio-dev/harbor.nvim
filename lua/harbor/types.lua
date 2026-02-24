@@ -42,4 +42,6 @@
 
 ---@class Lighthouse
 
+---@alias ExtensionName "telescope"|"lualine"
+
 return {}
