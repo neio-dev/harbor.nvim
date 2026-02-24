@@ -18,14 +18,14 @@ Harbor handles this with the bay fleet:
 
 ## Quickly switch between recent and pinned files
 
-https://github.com/user-attachments/assets/e805a264-edf7-47ab-ab4d-5a2361826131
+https://github.com/user-attachments/assets/9727e920-4d9b-4ec0-902a-147f129a0781
 
 > **Note: This project is in active development.** Core features are operational, but some areas are still being refined.
 
 ## Features
 
-- **Pin files with a shortcut** — Keep important files one keystroke away
-- **Cycle through recent files** — Quickly jump between the last files you opened
+- **Pin files with a shortcut** - Keep important files one keystroke away
+- **Cycle through recent files** - Quickly jump between the last files you opened
 
 ## Installation
 
