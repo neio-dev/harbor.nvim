@@ -1,19 +1,19 @@
 ```
- ██████╗ ██████╗ ██████╗ ███████╗
-██╔════╝██╔═══██╗██╔══██╗██╔════╝
-██║     ██║   ██║██║  ██║█████╗
-██║     ██║   ██║██║  ██║██╔══╝
-╚██████╗╚██████╔╝██████╔╝███████╗
- ╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝
-██████╗ ███████╗██╗   ██╗██╗███████╗██╗    ██╗
-██╔══██╗██╔════╝██║   ██║██║██╔════╝██║    ██║
-██████╔╝█████╗  ██║   ██║██║█████╗  ██║ █╗ ██║
-██╔══██╗██╔══╝  ╚██╗ ██╔╝██║██╔══╝  ██║███╗██║
-██║  ██║███████╗ ╚████╔╝ ██║███████╗╚███╔███╔╝
-╚═╝  ╚═╝╚══════╝  ╚═══╝  ╚═╝╚══════╝ ╚══╝╚══╝
+  ___ ___    _____ ____________________ ________ __________ 
+ /   |   \  /  _  \\______   \______   \\_____  \\______   \
+/    ~    \/  /_\  \|       _/|    |  _/ /   |   \|       _/
+\    Y    /    |    \    |   \|    |   \/    |    \    |   \
+ \___|_  /\____|__  /____|_  /|______  /\_______  /____|_  /
+       \/         \/       \/        \/         \/       \/ 
 ```
 
 # harbor.nvim
+
+One of the killer feature I couldn't get in other similar plugins was a temporary list.
+I often found myself coming back to 1 to 3 files, but not coming back enough to pin them.
+Harbor handle that with the Bay fleet:
+- Everytime you open a new file, it will be added to the fleet (doc, example, references for a function)
+- You still have a separate list of pinned files (main files of your current feature)
 
 ## Review pull requests and merge requests without leaving Neovim
 
@@ -23,7 +23,8 @@ https://github.com/user-attachments/assets/e805a264-edf7-47ab-ab4d-5a2361826131
 
 ## Features
 
-- **GitHub + GitLab** — auto-detects provider from git remote
+- **Pin frequent file with a shortcut** — auto-detects provider from git remote
+- **Browse last 3 opened files** — auto-detects provider from git remote
 
 ## Installation
 
@@ -36,18 +37,6 @@ https://github.com/user-attachments/assets/e805a264-edf7-47ab-ab4d-5a2361826131
 }
 ```
 
-### packer.nvim
-
-```lua
-use {
-  "afewyards/codereview.nvim",
-  requires = { "nvim-lua/plenary.nvim" },
-  config = function()
-    require("codereview").setup()
-  end,
-}
-```
-
 ## Quick Start
 
 -- keybinds 
@@ -56,115 +45,50 @@ use {
 
 ```lua
 require("harbor").setup({
-  -- Provider settings (all auto-detected from git remote)
-  base_url = nil,       -- API base URL override
-  project  = nil,       -- "owner/repo" override
-  platform = nil,       -- "github" | "gitlab" | nil (auto-detect)
-  github_token = nil,   -- GitHub personal access token
-  gitlab_token = nil,   -- GitLab personal access token
-
-  -- Picker: "telescope", "fzf", or "snacks" (auto-detected)
-  picker = nil,
-
-  -- Diff viewer
-  diff = {
-    context          = 8,   -- lines of context (0-20)
-    scroll_threshold = 50,  -- use scroll mode when file count <= threshold
-  },
-
-  -- AI review (requires Claude CLI)
-  ai = {
-    enabled   = true,
-    claude_cmd = "claude",
-    agent      = "code-review",
-  },
-
-  -- Override or disable keybindings
-  keymaps = {
-    -- quit = "q",          -- remap quit to q
-    -- toggle_resolve = false,  -- disable toggle resolve
-  },
+  
 })
 ```
 
 ## Default Keymaps
 
-### Navigation
+Default keymaps needs `harbor:set_default_keybinds()` in `setup()`.
+### Navigating through fleets
 
 | Key | Action |
 |-----|--------|
-| `]f` / `[f` | Next / previous file |
-| `]c` / `[c` | Next / previous comment |
-| `]s` / `[s` | Next / previous AI suggestion |
+| `<C-n>` | Switch to #1 position in Dock |
+| `<C-e>` | Switch to #2 position in Dock |
+| `<C-i>` | Switch to #3 position in Dock |
+| `<C-o>` | Switch to #4 position in Dock |
+| `<C-h>` | Cycle forward in Fleet |
+| `<C-j>` | Cycle backward in Fleet |
+| `<leader><C-n>` | Switch to #1 position in Fleet |
+| `<leader><C-e>` | Switch to #2 position in Fleet |
+| `<leader><C-i>` | Switch to #3 position in Fleet |
 
-### Comments & Discussions
 
-| Key | Action |
-|-----|--------|
-| `cc` | New comment (normal mode) |
-| `cc` | Range comment (visual mode) |
-| `r` | Reply to thread |
-| `gt` | Toggle resolve / unresolve |
-
-### Comments & Notes
-
-| Key | Action |
-|-----|--------|
-| `<Tab>` / `<S-Tab>` | Select next / previous note |
-| `e` | Edit selected note |
-| `x` | Delete selected note |
-
-### AI Suggestions
+### Edit fleet
+Opening any file that are not in any fleet will add it to the Bay fleet.
 
 | Key | Action |
 |-----|--------|
-| `A` | Start / cancel AI review |
-| `a` | Accept suggestion |
-| `x` | Dismiss suggestion |
-| `e` | Edit suggestion |
-| `ds` | Dismiss all suggestions |
+| `<leader>a` | Add current buf to the Docker fleet. If no space, input 1 to Dock length to replace |
+| `<leader><leader>x` | Remove current ship from current fleet. If in dock, it will move the ship to the Bay fleet |
 
-### View Controls
-
-| Key | Action |
-|-----|--------|
-| `+` / `-` | Increase / decrease context lines |
-| `<C-f>` | Toggle full file view |
-| `<C-a>` | Toggle scroll / per-file mode |
-
-### Actions
-
-| Key | Action |
-|-----|--------|
-| `S` | Submit draft comments |
-| `a` | Approve MR/PR |
-| `m` | Merge |
-| `o` | Open in browser |
-| `p` | Show pipeline status |
-| `R` | Refresh |
-| `Q` | Quit |
-
-All keymaps can be remapped or disabled via the `keymaps` option in `setup()`.
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `:CodeReview` | Open review picker |
-| `:CodeReviewAI` | Run AI review on current diff |
-| `:CodeReviewStart` | Start manual review session (comments become drafts) |
-| `:CodeReviewSubmit` | Submit draft comments |
-| `:CodeReviewApprove` | Approve current MR/PR |
-| `:CodeReviewOpen` | Create new MR/PR |
+| `:HrbSessionPath` | Print current session path |
+| `:HrbLighthouse` | Show Lighthouse input |
+| `:HrbDock` | Print Dock list |
+| `:HrbLoad` | Load harbor sessions |
+| `:HrbSave` | Save harbor sessions |
+| `:HrbAdd` | Add current buffer to dock |
+| `:HrbRemove` | Remove current buffer to dock |
+| `:HrbShow` | Show ship in dock at position of argument, e.g. :HrbShow 2 will display the 2 docked ship |
 
-## Supported Providers
-
-| Provider | Reviews | Comments | Resolve | AI Review | Create MR/PR |
-|----------|---------|----------|---------|-----------|-------------|
-| GitLab | Yes | Yes | Yes | Yes | Yes |
-| GitHub | Yes | Yes | Yes | Yes | Yes |
-
-Provider is auto-detected from the git remote URL. Use `platform = "github"` or `platform = "gitlab"` to override.
 
 ## License
 
