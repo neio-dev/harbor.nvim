@@ -1,17 +1,19 @@
 ```
-  ___ ___    _____ ____________________ ________ __________ 
- /   |   \  /  _  \\______   \______   \\_____  \\______   \
-/    ~    \/  /_\  \|       _/|    |  _/ /   |   \|       _/
-\    Y    /    |    \    |   \|    |   \/    |    \    |   \
- \___|_  /\____|__  /____|_  /|______  /\_______  /____|_  /
-       \/         \/       \/        \/         \/       \/ 
+.___.__  .______  .______  ._______ ._______  .______  
+:   |  \ :      \ : __   \ : __   / : .___  \ : __   \ 
+|   :   ||   .   ||  \____||  |>  \ | :   |  ||  \____|
+|   .   ||   :   ||   :  \ |  |>   \|     :  ||   :  \ 
+|___|   ||___|   ||   |___\|_______/ \_. ___/ |   |___\
+    |___|    |___||___|                :/     |___|    
+                                       :               
 ```
 
 # harbor.nvim
 
 One of the killer feature I couldn't get in other similar plugins was a temporary list.
 I often found myself coming back to 1 to 3 files, but not coming back enough to pin them.
-Harbor handle that with the Bay fleet:
+
+Harbor handle that with the bay fleet:
 - Everytime you open a new file, it will be added to the fleet (doc, example, references for a function)
 - You still have a separate list of pinned files (main files of your current feature)
 
@@ -39,7 +41,7 @@ https://github.com/user-attachments/assets/e805a264-edf7-47ab-ab4d-5a2361826131
 
 ## Quick Start
 
--- keybinds 
+You can use default keymaps by calling `harbor:set_default_keybinds()` in `setup()`.
 
 ## Plugin Configuration
 
@@ -51,7 +53,6 @@ require("harbor").setup({
 
 ## Default Keymaps
 
-Default keymaps needs `harbor:set_default_keybinds()` in `setup()`.
 ### Navigating through fleets
 
 | Key | Action |
