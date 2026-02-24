@@ -10,14 +10,13 @@
 
 # harbor.nvim
 
-One of the killer feature I couldn't get in other similar plugins was a temporary list.
-I often found myself coming back to 1 to 3 files, but not coming back enough to pin them.
+One of the features I couldn’t find in other similar plugins was a temporary file list. I often jump back to a few files (1–3) repeatedly, but not enough to pin them.
 
-Harbor handle that with the bay fleet:
-- Everytime you open a new file, it will be added to the fleet (doc, example, references for a function)
-- You still have a separate list of pinned files (main files of your current feature)
+Harbor handles this with the bay fleet:
+- Every time you open a file, it’s added to the fleet (docs, examples, references).
+- You still have a separate list for pinned files, the main files for your current feature.
 
-## Review pull requests and merge requests without leaving Neovim
+## Quickly switch between recent and pinned files
 
 https://github.com/user-attachments/assets/e805a264-edf7-47ab-ab4d-5a2361826131
 
@@ -25,8 +24,8 @@ https://github.com/user-attachments/assets/e805a264-edf7-47ab-ab4d-5a2361826131
 
 ## Features
 
-- **Pin frequent file with a shortcut** — auto-detects provider from git remote
-- **Browse last 3 opened files** — auto-detects provider from git remote
+- **Pin files with a shortcut** — Keep important files one keystroke away
+- **Cycle through recent files** — Quickly jump between the last files you opened
 
 ## Installation
 
@@ -47,7 +46,20 @@ You can use default keymaps by calling `harbor:set_default_keybinds()` in `setup
 
 ```lua
 require("harbor").setup({
-  
+    -- load builtin extensions
+    extensions = { "lualine", "telescope" },
+    -- show fleet history, eg if your bay length is 3 and history is 5, it will show you the history stack too
+    show_history = false,
+    bay = {
+        -- length of the fleet
+        length = 3,
+        -- length of last files tracked
+        history_length = 5,
+    },
+    dock = {
+        -- length of the fleet
+        length = 4,
+    },
 })
 ```
 
