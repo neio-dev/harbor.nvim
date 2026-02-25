@@ -8,6 +8,8 @@
                                        :               
 ```
 
+> Project in heavy development, you can use it but lot of changes are expected before full release. 
+
 # harbor.nvim
 
 One of the features I couldn’t find in other similar plugins was a temporary file list. I often jump back to a few files (1–3) repeatedly, but not enough to pin them.
