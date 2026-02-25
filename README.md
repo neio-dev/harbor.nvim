@@ -27,6 +27,11 @@ https://github.com/user-attachments/assets/9727e920-4d9b-4ec0-902a-147f129a0781
 - **Pin files with a shortcut** - Keep important files one keystroke away
 - **Cycle through recent files** - Quickly jump between the last files you opened
 
+### WIP/Upcoming
+Splits:
+- Better navigation for basic split
+- Lighthouse, builtin split manager
+
 ## Installation
 
 ### lazy.nvim
