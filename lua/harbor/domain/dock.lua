@@ -52,7 +52,10 @@ end
 function Dock:remove(target)
     local remove_data = Fleet.remove(self, target)
     local bay = self.harbor.bay
-    vim.notify("Ship [" .. remove_data.previous_ship:format_name() .. "] removed from slot #" .. remove_data.index)
+
+    if remove_data.previous_ship.format_name then
+        vim.notify("Ship [" .. remove_data.previous_ship:format_name() .. "] removed from slot #" .. remove_data.index)
+    end
 
     if bay ~= nil and remove_data.previous_ship ~= nil then
         bay:set(remove_data.previous_ship)

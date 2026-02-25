@@ -22,6 +22,20 @@ local function get_commands(harbor)
             { desc = "Show Lighthouse prompt" },
         },
         {
+            "HrbClear",
+            function()
+                harbor.dock:remove(1)
+                harbor.dock:remove(2)
+                harbor.dock:remove(3)
+                harbor.dock:remove(4)
+                harbor.bay:remove(1)
+                harbor.bay:remove(2)
+                harbor.bay:remove(3)
+            end,
+            { desc = "Show Lighthouse prompt" },
+        },
+
+        {
             "HrbDock",
             function()
                 local to_print = ""
