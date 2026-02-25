@@ -26,13 +26,19 @@ https://github.com/user-attachments/assets/9727e920-4d9b-4ec0-902a-147f129a0781
 
 ## Features
 
-- **Pin files with a shortcut** - Keep important files one keystroke away
-- **Cycle through recent files** - Quickly jump between the last files you opened
+- **Pin files with a shortcut** - Keep important files one keystroke away.
+- **Cycle through recent files** - Quickly jump between the last files you opened.
+- **Per project session** - Session are anchored on the directory Nvim was opened with.
 
 ### WIP/Upcoming
-Splits:
+- [] Splits:
 - Better navigation for basic split
 - Lighthouse, builtin split manager
+
+- [] Sessions:
+- Switch between different Harbor sessions
+
+- [] Telescope extension
 
 ## Installation
 
@@ -101,8 +107,9 @@ Opening any file that are not in any fleet will add it to the Bay fleet.
 | Command | Description |
 |---------|-------------|
 | `:HrbSessionPath` | Print current session path |
-| `:HrbLighthouse` | Show Lighthouse input |
+| `:HrbLighthouse` | **WIP** Show Lighthouse input |
 | `:HrbDock` | Print Dock list |
+| `:HrbClear` | Clear Dock and Bay |
 | `:HrbLoad` | Load harbor sessions |
 | `:HrbSave` | Save harbor sessions |
 | `:HrbAdd` | Add current buffer to dock |
