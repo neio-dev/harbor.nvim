@@ -169,7 +169,7 @@ end
 ---@param new_win? boolean
 function Fleet:show(index, new_win)
     if self.harbor.active_ship ~= nil then
-        self.harbor.active_ship:update_cursor()
+        self.harbor.active_ship:save_cursor()
         self.harbor.sessions:save()
     end
 

@@ -9,8 +9,10 @@ Ship.__index = Ship
 ---@return Ship
 function Ship:new(name, cursor_position, current_list)
     if cursor_position and (cursor_position.row == 0) then cursor_position.row = 1 end
+
     local ship = setmetatable({
         value = name,
+        open_once = false,
         position = cursor_position or { col = 0, row = 1 },
         current_list = current_list
     }, self)
@@ -34,7 +36,7 @@ function Ship:get_buf()
     return buf
 end
 
-function Ship:update_cursor()
+function Ship:save_cursor()
     local row, col = unpack(vim.api.nvim_win_get_cursor(vim.api.nvim_get_current_win()))
 
     self.position.row = row

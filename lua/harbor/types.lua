@@ -15,6 +15,7 @@
 ---@field value string
 ---@field position CursorPosition 
 ---@field current_list PossibleList 
+---@field open_once boolean 
 
 ---@class Fleet
 ---@field name string
