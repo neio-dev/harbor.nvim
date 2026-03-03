@@ -44,4 +44,24 @@ M.uid = function()
     )
 end
 
+---@enum ErrorType
+ERROR_TYPES = {
+   ShipError = "ShipError",
+   FleetError = "FleetError",
+}
+
+---comment
+---@param msg string
+---@param type ErrorType
+---@param code any
+---@return table
+M.error = function(msg, type, code)
+    error({
+        type = type,
+        code = code,
+        msg = msg,
+    })
+end
+
+
 return M

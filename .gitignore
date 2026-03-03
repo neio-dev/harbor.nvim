@@ -1,3 +1,7 @@
 /luarocks
+<<<<<<< HEAD
+=======
+/lua
+>>>>>>> c5a067f (test(ship): add initial tests and test ship class)
 /lua_modules
 /.luarocks
