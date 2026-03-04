@@ -1,4 +1,9 @@
+local buffer_adapter = require "harbor.adapters.buffer_adapter"
+local window_adapter = require "harbor.adapters.window_adapter"
+
 local buffer = {}
+buffer.adapter = buffer_adapter
+buffer.win_adapter = window_adapter
 
 ---@class BufData
 ---@field name string
@@ -9,8 +14,8 @@ local buffer = {}
 
 ---@return BufData
 function buffer:get_current()
-    local buf = vim.api.nvim_get_current_buf()
-    local name = vim.api.nvim_buf_get_name(buf)
+    local buf = buffer.adapter.get_current()
+    local name = buffer.adapter.get_name(buf)
 
     return self:get(name)
 end
@@ -20,14 +25,13 @@ end
 function buffer:get(name)
     local buf = vim.fn.bufnr(name)
     local type = vim.uv.fs_stat(name) ~= nil and vim.uv.fs_stat(name).type or nil
-    local number = vim.fn.bufnr(buf)
-    local row,col = unpack(vim.api.nvim_win_get_cursor(0))
+    local row,col = unpack(buffer.win_adapter.get_cursor(0))
 
     return {
         name = name,
         type = type,
         buf = buf,
-        number = number,
+        number = buf,
         cursor = { row=row, col=col }
     }
 end

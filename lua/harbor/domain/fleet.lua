@@ -2,6 +2,8 @@ local Ship = require("harbor.domain.ship")
 local buffer = require("harbor.infra.buffers")
 local ui = require("harbor.ui")
 local utils = require("harbor.utils")
+local buffer_adapter = require("harbor.adapters.buffer_adapter")
+local window_adapter = require("harbor.adapters.window_adapter")
 
 -- Used in place of nil to keep table functions usable
 -- e.g. nil will stop a for loop at nil index
@@ -20,6 +22,9 @@ local Fleet = {
 
 Fleet.__index = Fleet
 
+Fleet.buffer_adapter = buffer_adapter
+Fleet.window_adapter = window_adapter
+
 ---@param harbor Harbor
 ---@param name string
 ---@param length number
@@ -27,6 +32,10 @@ Fleet.__index = Fleet
 ---@param history_length? number 10
 ---@return Fleet
 function Fleet.new(self, harbor, name, length, resolve, history_length)
+    if not name then
+        utils.error("Name is required", ERROR_TYPES.FleetError)
+    end
+
     local instance = setmetatable({
         name = name,
         ships = {},
@@ -82,9 +91,10 @@ function Fleet:set(ship, index)
     local previous_ship = nil
     local idx = index or (self.resolve == RESOLVE.replace and self:get_next_empty_idx() or nil)
     if ship == nil then
-        local curr_buf = buffer:get_current()
+        local curr_name = self.buffer_adapter.get_name(self.buffer_adapter.get_current())
+        local curr_cursor = self.window_adapter.get_cursor(self.window_adapter.get_current())
 
-        ship = Ship:new(curr_buf.name, curr_buf.cursor)
+        ship = Ship:new(curr_name, curr_cursor)
     end
 
     ship.current_list = self.name
@@ -120,7 +130,7 @@ function Fleet:remove(target)
     local index = nil
 
     if target == nil then
-        local curr_name = buffer:get_current().name
+        local curr_name = self.buffer_adapter.get_name(self.buffer_adapter.get_current())
         index = self:get_ship_index(curr_name)
     elseif type(target) == "number" then
         index = target
@@ -155,12 +165,12 @@ end
 ---@private
 ---@param target_path string
 function Fleet:find_and_focus_win(target_path)
-    for _, win in ipairs(vim.api.nvim_list_wins()) do
-        local buf = vim.api.nvim_win_get_buf(win)
-        local buf_path = vim.api.nvim_buf_get_name(buf)
+    for _, win in ipairs(self.window_adapter.list()) do
+        local buf = self.window_adapter.get_buf(win)
+        local buf_path = self.buffer_adapter.get_name(buf)
 
         if buf_path == target_path then
-            vim.api.nvim_set_current_win(win)
+            self.window_adapter.set_current(win)
         end
     end
 end
@@ -168,13 +178,14 @@ end
 ---@param index number
 ---@param new_win? boolean
 function Fleet:show(index, new_win)
-    if self.harbor.active_ship ~= nil then
+    if self.harbor.active_ship ~= nil and self.harbor.active_ship ~= EMPTY then
         self.harbor.active_ship:save_cursor()
         self.harbor.sessions:save()
     end
 
     ---@type Ship
     local ship = self.ships[tonumber(index)]
+    print(ship)
     if ship == EMPTY or ship == nil then
         return
     end
@@ -184,13 +195,13 @@ function Fleet:show(index, new_win)
         self:find_and_focus_win(ship.value)
     end
     if bufnr ~= -1 then
-        vim.api.nvim_set_current_buf(bufnr)
+        self.buffer_adapter.set_current(bufnr)
     else
         vim.schedule(function()
             --vim.schedule(function() vim.cmd("edit " .. path) end)
-            bufnr = vim.fn.bufadd(ship.value)
-            vim.fn.bufload(bufnr)
-            vim.api.nvim_set_current_buf(bufnr)
+            bufnr = self.buffer_adapter.add(ship.value)
+            self.buffer_adapter.load(bufnr)
+            self.buffer_adapter.set_current(bufnr)
             --vim.api.nvim_win_set_cursor(vim.api.nvim_get_current_win(), { ship.position.row, ship.position.col })
         end)
     end
@@ -259,9 +270,9 @@ end
 
 ---@param reverse boolean
 function Fleet:cycle(reverse)
-    local curr_buf = buffer:get_current()
+    local curr_buf_name = self.buffer_adapter.get_name(self.buffer_adapter.get_current())
     local direction = reverse and -1 or 1
-    local curr_index = self:get_ship_index(curr_buf.name) or (self.previous_index and self.previous_index - direction)
+    local curr_index = self:get_ship_index(curr_buf_name) or (self.previous_index and self.previous_index - direction)
     local next_index = self:get_next_populated_idx(curr_index or 0, direction)
 
     if self.resolve == RESOLVE.prepend then
