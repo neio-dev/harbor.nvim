@@ -1,8 +1,8 @@
 local M = {}
 
 ---@param on_input fun(input_char: string, full_input: string): nil
----@param on_submit fun(full_input: string): nil
----@param on_cancel fun(): nil
+---@param on_submit? fun(full_input: string): nil
+---@param on_cancel? fun(): nil
 ---@param length number
 ---@return boolean?
 M.smart_input = function(on_input, on_submit, on_cancel, length)

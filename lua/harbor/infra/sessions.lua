@@ -85,6 +85,7 @@ end
 function SessionManager:save(name)
     local json = vim.fn.json_encode
     local filepath = self:get_session_path()
+    local doc = self.harbor.dock:get()
     local current_session_data = { dock = self.harbor.dock:get(), bay = self.harbor.bay:get() }
     local prev_data = self:get_session_data() or {}
     local new_data = prev_data["last_session"] and prev_data or {}
@@ -98,7 +99,7 @@ function SessionManager:save(name)
     end
 
     vim.fn.mkdir(self.dir, "p")
-    vim.fn.writefile({ json(new_data) }, filepath)
+    -- vim.fn.writefile({ json(new_data) }, filepath)
 end
 
 ---@return string

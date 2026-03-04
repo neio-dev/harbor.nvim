@@ -4,6 +4,7 @@ local ui = require("harbor.ui")
 local utils = require("harbor.utils")
 local buffer_adapter = require("harbor.adapters.buffer_adapter")
 local window_adapter = require("harbor.adapters.window_adapter")
+local emitter        = require("harbor.infra.emitter")
 
 -- Used in place of nil to keep table functions usable
 -- e.g. nil will stop a for loop at nil index
@@ -43,6 +44,7 @@ function Fleet.new(self, harbor, name, length, resolve, history_length)
         previous_index = nil,
         length = length,
         history_length = history_length or 10,
+        active_ship = nil,
     }, self)
 
     instance.harbor = harbor
@@ -117,9 +119,10 @@ function Fleet:set(ship, index)
     end
 
     self.ships[idx or 1] = ship
-    self.harbor.active_ship = ship
+    self.active_ship = ship
     self.harbor.sessions:save()
-    self.harbor.emitter:emit("FLEET_ADD", { fleet = self, ship = ship})
+    emitter:emit("FLEET_ADD", { fleet = self, ship = ship})
+    emitter:emit("SET_ACTIVE_SHIP", { fleet = self, ship = ship})
 
     return { ship = ship, previous_ship = previous_ship }
 end
@@ -157,7 +160,7 @@ function Fleet:remove(target)
     end
 
 
-    self.harbor.emitter:emit("FLEET_REMOVE", { fleet = self, index, previous_ship})
+    emitter:emit("FLEET_REMOVE", { fleet = self, index, previous_ship})
 
     return { previous_ship = previous_ship, index = index }
 end
@@ -178,14 +181,13 @@ end
 ---@param index number
 ---@param new_win? boolean
 function Fleet:show(index, new_win)
-    if self.harbor.active_ship ~= nil and self.harbor.active_ship ~= EMPTY then
-        self.harbor.active_ship:save_cursor()
+    if self.active_ship ~= nil and self.active_ship ~= EMPTY then
+        self.active_ship:save_cursor()
         self.harbor.sessions:save()
     end
 
     ---@type Ship
     local ship = self.ships[tonumber(index)]
-    print(ship)
     if ship == EMPTY or ship == nil then
         return
     end
@@ -194,19 +196,19 @@ function Fleet:show(index, new_win)
     if new_win ~= true then
         self:find_and_focus_win(ship.value)
     end
+
     if bufnr ~= -1 then
         self.buffer_adapter.set_current(bufnr)
     else
         vim.schedule(function()
-            --vim.schedule(function() vim.cmd("edit " .. path) end)
             bufnr = self.buffer_adapter.add(ship.value)
             self.buffer_adapter.load(bufnr)
             self.buffer_adapter.set_current(bufnr)
-            --vim.api.nvim_win_set_cursor(vim.api.nvim_get_current_win(), { ship.position.row, ship.position.col })
         end)
     end
 
-    self.harbor.active_ship = ship
+    self.active_ship = ship
+    emitter:emit("SET_ACTIVE_SHIP", { fleet = self, ship = ship})
 end
 
 ---@param name? string|{}
@@ -240,7 +242,7 @@ function Fleet:get_next_empty_idx()
 end
 
 ---@param starting_index number
----@param direction number?
+---@param direction number? 1 = forwards, 0 = backwards
 ---@return number?
 function Fleet:get_next_populated_idx(starting_index, direction)
     local _direction = direction ~= nil and direction or 1

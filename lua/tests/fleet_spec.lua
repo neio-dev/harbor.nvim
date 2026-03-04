@@ -9,6 +9,7 @@ Ship.buffer_adapter       = test_buffer_adapter
 Ship.win_adapter          = test_window_adapter
 
 harbor:setup({})
+
 describe("Fleet:new", function()
     it("initializes with defaults", function()
         local test_fleet = Fleet:new(nil, "test")
@@ -91,28 +92,28 @@ describe("Fleet:cycle", function()
         fleet:show(2)
         fleet:cycle(false)
 
-        assert.are.same(ships[3].value, harbor.active_ship.value)
+        assert.are.same(ships[3].value, fleet.active_ship.value)
     end)
 
     it("cycle backwards", function()
         fleet:show(2)
         fleet:cycle(true)
 
-        assert.are.same(ships[1].value, harbor.active_ship.value)
+        assert.are.same(ships[1].value, fleet.active_ship.value)
     end)
 
     it("loop to start", function()
         fleet:show(4)
         fleet:cycle(false)
 
-        assert.are.same(ships[1].value, harbor.active_ship.value)
+        assert.are.same(ships[1].value, fleet.active_ship.value)
     end)
 
     it("loop to end", function()
         fleet:show(1)
         fleet:cycle(true)
 
-        assert.are.same(ships[#ships].value, harbor.active_ship.value)
+        assert.are.same(ships[#ships].value, fleet.active_ship.value)
     end)
 
     it("jump forwards over empty ships", function()
@@ -121,7 +122,7 @@ describe("Fleet:cycle", function()
         fleet:remove(3)
         fleet:cycle(false)
 
-        assert.are.same(ships[#ships].value, harbor.active_ship.value)
+        assert.are.same(ships[#ships].value, fleet.active_ship.value)
     end)
 
     it("jump backwards over empty ships", function()
@@ -130,7 +131,7 @@ describe("Fleet:cycle", function()
         fleet:remove(3)
         fleet:cycle(true)
 
-        assert.are.same(ships[1].value, harbor.active_ship.value)
+        assert.are.same(ships[1].value, fleet.active_ship.value)
     end)
 
     it("loop to start and jump forwards over empty ships", function()
@@ -138,7 +139,7 @@ describe("Fleet:cycle", function()
         fleet:remove(1)
         fleet:cycle(false)
 
-        assert.are.same(ships[2].value, harbor.active_ship.value)
+        assert.are.same(ships[2].value, fleet.active_ship.value)
     end)
 
     it("loop to end and jump backwards over empty ships", function()
@@ -146,10 +147,58 @@ describe("Fleet:cycle", function()
         fleet:remove(4)
         fleet:cycle(true)
 
-        assert.are.same(ships[3].value, harbor.active_ship.value)
+        assert.are.same(ships[3].value, fleet.active_ship.value)
+    end)
+end)
+
+describe("Fleet:get_next_populated_idx", function()
+    ---@type Fleet
+    local fleet
+
+    before_each(function()
+        fleet = Fleet:new(harbor, "test", 4)
+    end)
+
+    it("should return following index", function()
+        local ship = Ship:new("test.txt", { row = 0, col = 0 })
+        local second_ship = Ship:new("test2.txt", { row = 0, col = 0 })
+        fleet:set(ship)
+        fleet:set(second_ship)
+        assert.are.equal(2, fleet:get_next_populated_idx(1))
+    end)
+
+    it("should skip to following index", function()
+        local ship = Ship:new("test.txt", { row = 0, col = 0 })
+        local second_ship = Ship:new("test2.txt", { row = 0, col = 0 })
+        fleet:set(ship)
+        fleet:set(second_ship, 3)
+        assert.are.equal(3, fleet:get_next_populated_idx(1))
     end)
 end)
 
 describe("Fleet:show", function()
+    ---@type Fleet
+    local fleet
 
+    before_each(function()
+        fleet = Fleet:new(harbor, "test", 4)
+    end)
+
+    it("do nothing if ship empty", function()
+        local ship = Ship:new("test.txt", { row = 0, col = 0 })
+        fleet:set(ship)
+        fleet:show(2)
+
+        assert.are.equal(ship.value, fleet.active_ship.value)
+    end)
+
+    it("changes active ship", function()
+        local ship = Ship:new("test.txt", { row = 0, col = 0 })
+        local second_ship = Ship:new("test2.txt", { row = 0, col = 0 })
+        fleet:set(ship)
+        fleet:set(second_ship)
+        fleet:show(1)
+
+        assert.are.equal(ship.value, fleet.active_ship.value)
+    end)
 end)

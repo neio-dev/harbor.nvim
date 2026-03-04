@@ -1,7 +1,7 @@
 local Dock = require("harbor.domain.dock")
 local Bay = require("harbor.domain.bay")
 local Ship = require("harbor.domain.ship")
-local Emitter = require("harbor.infra.emitter")
+local emitter = require("harbor.infra.emitter")
 local SessionManager = require("harbor.infra.sessions")
 local Commands = require("harbor.core.commands")
 local Config = require("harbor.core.config")
@@ -14,7 +14,7 @@ require("harbor.types")
 ---@class Harbor
 local Harbor = {}
 Harbor.__index = Harbor
-
+Harbor.emitter = emitter
 ---@return Harbor
 function Harbor:new()
     ---@class Harbor
@@ -22,7 +22,6 @@ function Harbor:new()
         active_ship = nil,
     }, self)
 
-    instance.emitter = Emitter:new()
     instance.config = Config:new()
 
     return instance
@@ -92,7 +91,7 @@ function Harbor:setup(partial_config)
     self.sessions = SessionManager:new(self)
     self.lighthouse = Lighthouse:new(self)
 
-    self.emitter:emit("SETUP", self.config.opts)
+    emitter.emit("SETUP", self.config.opts)
     self:set_autocommands()
     Commands:init(self)
     self:set_hl_groups()

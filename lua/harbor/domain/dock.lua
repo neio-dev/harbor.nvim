@@ -15,7 +15,8 @@ function Dock:new(harbor)
         harbor,
         "dock",
         harbor.config.opts.dock.length or 4,
-        RESOLVE.replace
+        RESOLVE.replace,
+        harbor.config.opts.dock.length or 4
     )
 
     return instance

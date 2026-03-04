@@ -3,15 +3,7 @@
 local M = {
 }
 
-M.__index = M
-
----@return Emitter
-function M:new()
-    local instance = setmetatable({}, self)
-    instance.event_bus = {}
-
-    return instance
-end
+M.event_bus = {}
 
 ---@enum Events
 local EVENTS = {
@@ -23,21 +15,21 @@ local EVENTS = {
 
 ---@param event Events
 ---@param cb fun(): nil
-function M:on(event, cb)
-    if not self.event_bus[event] then self.event_bus[event] = {} end
+M.on = function(event, cb)
+    if not M.event_bus[event] then M.event_bus[event] = {} end
 
     table.insert(
-        self.event_bus[event],
+        M.event_bus[event],
         cb
     )
 end
 
 ---@param event Events
 ---@param ... any
-function M:emit(event, ...)
-    if not self.event_bus[event] then return end
+M.emit = function(event, ...)
+    if not M.event_bus[event] then return end
 
-    for _, eachCallback in ipairs(self.event_bus[event]) do
+    for _, eachCallback in ipairs(M.event_bus[event]) do
         eachCallback(...)
     end
 end
