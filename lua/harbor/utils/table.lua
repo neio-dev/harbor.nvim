@@ -1,13 +1,32 @@
 local M = {}
 
----@param ... table
+---@param tbl table
 ---@return table
-M.merge = function(...)
+M.shallow_copy = function(tbl)
     local res = {}
 
-    for _, table in ipairs({ ... }) do
-        for k, v in pairs(table) do
-            res[k] = v
+    for key, value in pairs(tbl) do
+        if type(value) == "table" then
+            res[key] = M.shallow_copy(value)
+        else
+            res[key] = value
+        end
+    end
+
+    return res
+end
+
+---@param initial table
+---@param to_merge table
+---@return table
+M.merge = function(initial, to_merge)
+    local res = M.shallow_copy(initial)
+
+    for key, value in pairs(to_merge) do
+        if type(res[key]) == "table" and type(value) == "table" then
+            res[key] = M.merge(res[key], value)
+        else
+            res[key] = value
         end
     end
 

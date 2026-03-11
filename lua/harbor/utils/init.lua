@@ -52,13 +52,13 @@ ERROR_TYPES = {
 
 ---comment
 ---@param msg string
----@param type ErrorType
----@param code any
+---@param type? ErrorType
+---@param code? any
 ---@return table
 M.error = function(msg, type, code)
     error({
-        type = type,
-        code = code,
+        type = type or nil,
+        code = code or nil,
         msg = msg,
     })
 end
