@@ -1,13 +1,7 @@
+require("tests.spec_helper")
 local Fleet               = require "harbor.domain.fleet"
 local Ship                = require "harbor.domain.ship"
 local harbor              = require "harbor"
-local test_window_adapter = require "harbor.adapters.test_window_adapter"
-local test_buffer_adapter = require "harbor.adapters.test_buffer_adapter"
-
-Fleet.buffer_adapter      = test_buffer_adapter
-Ship.buffer_adapter       = test_buffer_adapter
-Ship.win_adapter          = test_window_adapter
-
 harbor:setup({})
 
 describe("Fleet:new", function()
