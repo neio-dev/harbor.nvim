@@ -9,12 +9,12 @@ local active_icon = ""
 
 ---@param ship_index number
 function _G.HarborBayShow(ship_index)
-    require("harbor").bay:show(ship_index)
+    require("harbor").fleets.bay:show(ship_index)
 end
 
 ---@param ship_index number
 function _G.HarborDockShow(ship_index)
-    require("harbor").dock:show(ship_index)
+    require("harbor").fleets.dock:show(ship_index)
 end
 
 ---comment
@@ -152,8 +152,8 @@ function harbor_lualine:setup()
     local ext = function()
         local hl = get_active_highlight(true)
         local harbor = require("harbor")
-        local bay_fleet = get_fleet("BAY", harbor.bay, { invert = false, show_history = false })
-        local dock_fleet = get_fleet("DOCK", harbor.dock, { show_index = true, invert = false })
+        local bay_fleet = get_fleet("BAY", harbor.fleets.bay, { invert = false, show_history = false })
+        local dock_fleet = get_fleet("DOCK", harbor.fleets.dock, { show_index = true, invert = false })
         return T({ bay_fleet }, { " " }, { " ||| ", hl.sep }, { " " }, { dock_fleet })
     end
 

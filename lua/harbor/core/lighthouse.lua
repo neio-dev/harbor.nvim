@@ -100,7 +100,7 @@ end
 ---@param open_callback? fun(): nil
 function Lighthouse:handle_input_win(input, forced_win, open_wins, open_callback)
     local index = utils.table.get_index(MAP, string.lower(input))
-    local ship = self.harbor.dock:get(index or 1)
+    local ship = self.harbor.fleets.dock:get(index or 1)
     if not ship then return end
 
     local new_win = create_split({

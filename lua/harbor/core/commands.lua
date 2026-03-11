@@ -24,13 +24,13 @@ local function get_commands(harbor)
         {
             "HrbClear",
             function()
-                harbor.dock:remove(1)
-                harbor.dock:remove(2)
-                harbor.dock:remove(3)
-                harbor.dock:remove(4)
-                harbor.bay:remove(1)
-                harbor.bay:remove(2)
-                harbor.bay:remove(3)
+                harbor.fleets.dock:remove(1)
+                harbor.fleets.dock:remove(2)
+                harbor.fleets.dock:remove(3)
+                harbor.fleets.dock:remove(4)
+                harbor.fleets.bay:remove(1)
+                harbor.fleets.bay:remove(2)
+                harbor.fleets.bay:remove(3)
             end,
             { desc = "Show Lighthouse prompt" },
         },
@@ -39,7 +39,7 @@ local function get_commands(harbor)
             "HrbDock",
             function()
                 local to_print = ""
-                for i, v in ipairs(harbor.dock:get()) do
+                for i, v in ipairs(harbor.fleets.dock:get()) do
                     local val = v.value ~= nil and v.value or "empty"
                     to_print = to_print .. val .. ", "
                 end
@@ -51,15 +51,15 @@ local function get_commands(harbor)
             "HrbDev",
             function()
                 local path = "/home/dev/.config/nvim/lua/harbor"
-                harbor.dock.ships = { EMPTY, EMPTY, EMPTY, EMPTY }
-                harbor.bay.ships = { EMPTY, EMPTY, EMPTY }
-                harbor.dock:set(Ship:new(path .. "/harbor.lua"))
-                harbor.dock:set(Ship:new(path .. "/fleet.lua"))
-                harbor.dock:set(Ship:new(path .. "/notes.md"))
-                harbor.dock:set(Ship:new(path .. "/types.lua"))
-                harbor.bay:set(Ship:new(path .. "/dock.lua"))
-                harbor.bay:set(Ship:new(path .. "/bay.lua"))
-                harbor.bay:set(Ship:new(path .. "/sessions.lua"))
+                harbor.fleets.dock.ships = { EMPTY, EMPTY, EMPTY, EMPTY }
+                harbor.fleets.bay.ships = { EMPTY, EMPTY, EMPTY }
+                harbor.fleets.dock:set(Ship:new(path .. "/harbor.lua"))
+                harbor.fleets.dock:set(Ship:new(path .. "/fleet.lua"))
+                harbor.fleets.dock:set(Ship:new(path .. "/notes.md"))
+                harbor.fleets.dock:set(Ship:new(path .. "/types.lua"))
+                harbor.fleets.bay:set(Ship:new(path .. "/dock.lua"))
+                harbor.fleets.bay:set(Ship:new(path .. "/bay.lua"))
+                harbor.fleets.bay:set(Ship:new(path .. "/sessions.lua"))
             end,
             { desc = "Load test harbor session" }
         },
@@ -88,9 +88,9 @@ local function get_commands(harbor)
         {
             "HrbAdd",
             function()
-                harbor.dock:set()
+                harbor.fleets.dock:set()
                 local to_print = ""
-                for i, v in ipairs(harbor.dock:get()) do
+                for i, v in ipairs(harbor.fleets.dock:get()) do
                     local val = v.value ~= nil and v.value or "empty"
                     to_print = to_print .. val .. ", "
                 end
@@ -101,9 +101,9 @@ local function get_commands(harbor)
         {
             "HrbRemove",
             function(opt)
-                harbor.dock:remove(opt.args and tonumber(opt.args) or nil)
+                harbor.fleets.dock:remove(opt.args and tonumber(opt.args) or nil)
                 local to_print = ""
-                for i, v in ipairs(harbor.dock:get()) do
+                for i, v in ipairs(harbor.fleets.dock:get()) do
                     local val = v.value ~= nil and v.value or "empty"
                     to_print = to_print .. val .. ", "
                 end
@@ -113,7 +113,7 @@ local function get_commands(harbor)
         }, {
         "HrbShow",
         function(opt)
-            harbor.bay:show(opt.args)
+            harbor.fleets.bay:show(opt.args)
         end,
         { desc = "Show docked ship", nargs = 1 }
     },

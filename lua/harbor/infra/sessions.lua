@@ -59,11 +59,11 @@ function SessionManager:load()
     data = data[self.current_session]
 
     if data.bay then
-        self.harbor.bay.ships = self:parse_fleet(data, "bay")
+        self.harbor.fleets.bay.ships = self:parse_fleet(data, "bay")
     end
 
     if data.dock then
-        self.harbor.dock.ships = self:parse_fleet(data, "dock")
+        self.harbor.fleets.dock.ships = self:parse_fleet(data, "dock")
     end
 end
 
@@ -85,8 +85,7 @@ end
 function SessionManager:save(name)
     local json = vim.fn.json_encode
     local filepath = self:get_session_path()
-    local doc = self.harbor.dock:get()
-    local current_session_data = { dock = self.harbor.dock:get(), bay = self.harbor.bay:get() }
+    local current_session_data = { dock = self.harbor.fleets.dock:get(), bay = self.harbor.fleets.bay:get() }
     local prev_data = self:get_session_data() or {}
     local new_data = prev_data["last_session"] and prev_data or {}
 

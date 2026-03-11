@@ -11,6 +11,7 @@ local EVENTS = {
     FLEET_REMOVE = "FLEET_REMOVE",
     FLEET_SET = "FLEET_SET",
     SETUP = "SETUP",
+    SET_ACTIVE_SHIP = "SET_ACTIVE_SHIP",
 }
 
 ---@param event Events

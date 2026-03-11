@@ -24,12 +24,12 @@ local Fleet = {
 Fleet.__index = Fleet
 
 Fleet.buffer_adapter = buffer_adapter
-Fleet.window_adapter = window_adapter
+Fleet.win_adapter = window_adapter
 
 ---@param harbor Harbor
 ---@param name string
 ---@param length number
----@param resolve RESOLVE RESOLVE.replace
+---@param resolve? RESOLVE RESOLVE.replace
 ---@param history_length? number 10
 ---@return Fleet
 function Fleet.new(self, harbor, name, length, resolve, history_length)
@@ -94,7 +94,7 @@ function Fleet:set(ship, index)
     local idx = index or (self.resolve == RESOLVE.replace and self:get_next_empty_idx() or nil)
     if ship == nil then
         local curr_name = self.buffer_adapter.get_name(self.buffer_adapter.get_current())
-        local curr_cursor = self.window_adapter.get_cursor(self.window_adapter.get_current())
+        local curr_cursor = self.win_adapter.get_cursor(self.win_adapter.get_current())
 
         ship = Ship:new(curr_name, curr_cursor)
     end
@@ -120,6 +120,7 @@ function Fleet:set(ship, index)
 
     self.ships[idx or 1] = ship
     self.active_ship = ship
+    self.harbor.active_ship = ship
     self.harbor.sessions:save()
     emitter:emit("FLEET_ADD", { fleet = self, ship = ship})
     emitter:emit("SET_ACTIVE_SHIP", { fleet = self, ship = ship})
@@ -168,12 +169,12 @@ end
 ---@private
 ---@param target_path string
 function Fleet:find_and_focus_win(target_path)
-    for _, win in ipairs(self.window_adapter.list()) do
-        local buf = self.window_adapter.get_buf(win)
+    for _, win in ipairs(self.win_adapter.list()) do
+        local buf = self.win_adapter.get_buf(win)
         local buf_path = self.buffer_adapter.get_name(buf)
 
         if buf_path == target_path then
-            self.window_adapter.set_current(win)
+            self.win_adapter.set_current(win)
         end
     end
 end

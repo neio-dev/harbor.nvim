@@ -30,7 +30,7 @@ function Dock:set(_ship, index)
     index = self:get_ship_index(fleet.ship and fleet.ship.value or nil)
     vim.notify("Ship [" .. fleet.ship:format_name() .. "] docked to slot #" .. index)
 
-    local bay = self.harbor.bay
+    local bay = self.harbor.fleets.bay
     if bay ~= nil and fleet.ship ~= nil then
         local bay_ship_index = bay:get_ship_index(fleet.ship.value)
         if bay_ship_index ~= nil then
@@ -45,14 +45,14 @@ end
 
 ---@param index number
 function Dock:show(index)
-    self.harbor.bay:close_split()
+    self.harbor.fleets.bay:close_split()
     Fleet.show(self, index)
 end
 
 ---@param target string|number|Ship
 function Dock:remove(target)
     local remove_data = Fleet.remove(self, target)
-    local bay = self.harbor.bay
+    local bay = self.harbor.fleets.bay
 
     if remove_data.previous_ship.format_name then
         vim.notify("Ship [" .. remove_data.previous_ship:format_name() .. "] removed from slot #" .. remove_data.index)

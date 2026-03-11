@@ -1,4 +1,5 @@
 local utils = require("harbor.utils")
+---@class Config
 local Config = {}
 Config.__index = Config
 
@@ -35,7 +36,6 @@ function Config:load(partial_config)
     if partial_config.dock ~= nil then
         self.opts.dock = utils.table.merge(self.opts.dock, partial_config.dock)
     end
-
 end
 
 return Config

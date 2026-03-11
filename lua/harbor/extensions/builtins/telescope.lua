@@ -5,7 +5,7 @@ harbor_telescope.__index = harbor_telescope
 local function get_ships(fleet)
     local harbor = require("harbor")
     local new_table = {}
-    local ships = harbor[fleet or "dock"].ships
+    local ships = harbor.fleets[fleet or "dock"].ships
 
     for index, value in ipairs(ships) do
         if not value.format_name then break end
@@ -50,7 +50,7 @@ function harbor_telescope:setup(harbor)
                 actions.select_default:replace(function()
                     actions.close(prompt_bufnr)
                     local selection = actions_state.get_selected_entry()
-                    harbor.dock:show(selection.index)
+                    harbor.fleets.dock:show(selection.index)
                 end)
                 return true
             end,
@@ -77,7 +77,7 @@ function harbor_telescope:setup(harbor)
                 actions.select_default:replace(function()
                     actions.close(prompt_bufnr)
                     local selection = actions_state.get_selected_entry()
-                    harbor.bay:show(selection.index)
+                    harbor.fleets.bay:show(selection.index)
                 end)
                 return true
             end,
@@ -135,7 +135,7 @@ function harbor_telescope:setup(harbor)
                 actions.select_default:replace(function()
                     actions.close(prompt_bufnr)
                     local selection = actions_state.get_selected_entry()
-                    harbor.bay:show(selection.index)
+                    harbor.fleets.bay:show(selection.index)
                 end)
                 return true
             end,
