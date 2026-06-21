@@ -40,7 +40,10 @@ function Harbor:set_default_keybinds()
     vim.keymap.set("n", "<C-j>", function() self.fleets.bay:cycle(true) end)
     vim.keymap.set("n", "<C-t>", function() self.lighthouse:input() end)
     --remove current ship from current list
-    vim.keymap.set("n", "<leader><leader>x", function() self:get_current_list():remove() end)
+    vim.keymap.set("n", "<leader><leader>x", function()
+        print("leader", self, self:get_current_list())
+        self:get_current_list():remove()
+    end)
 
     vim.keymap.set("n", "<C-n>", function() self.fleets.dock:show(1) end)
     vim.keymap.set("n", "<C-e>", function() self.fleets.dock:show(2) end)

@@ -1,8 +1,8 @@
+local esper = require("esper")
 local Extension = require("harbor.extensions.extension")
 local buffer = require("harbor.infra.buffers")
 local utils = require("harbor.utils")
 local harbor_lualine = Extension:new("lualine")
-
 harbor_lualine.__index = harbor_lualine
 
 local active_icon = ""
@@ -61,9 +61,9 @@ end
 local function get_diagnostic(name)
     local prefix = ""
     local buf = name and buffer:get(name) or nil
-    if buf == nil then return "" end
+    if nil == buf then return "" end
     local bufnr = buf.number
-    if bufnr ~= -1 then
+    if -1 ~= bufnr then
         local diagnostics = vim.diagnostic.get(bufnr)
         local severity = 0
 
@@ -71,11 +71,15 @@ local function get_diagnostic(name)
             severity = tonumber(diag.severity) > severity and tonumber(diag.severity) or severity
         end
 
-        if severity ~= nil then
-            if severity == vim.diagnostic.severity.ERROR then prefix = " " end
-            if severity == vim.diagnostic.severity.WARN then prefix = " " end
-            if severity == vim.diagnostic.severity.INFO then prefix = " " end
-            if severity == vim.diagnostic.severity.HINT then prefix = " " end
+        if nil ~= severity then
+            if vim.diagnostic.severity.ERROR == severity then prefix = " " end
+            if vim.diagnostic.severity.WARN == severity then prefix = " " end
+            if vim.diagnostic.severity.INFO == severity then prefix = " " end
+            if vim.diagnostic.severity.HINT == severity then prefix = " " end
+        end
+
+        if true == vim.bo[bufnr].modified then
+            prefix = "● " .. prefix
         end
     end
 
@@ -127,7 +131,7 @@ local function get_fleet(name, fleet, opt)
         line = line .. " "
 
         if is_last then
-            line = line .. "[●] "
+            line = line .. " "
         end
 
         if opt.show_index then
@@ -148,13 +152,57 @@ local function get_fleet(name, fleet, opt)
     return T({ line, hl.active })
 end
 
+local Div = esper.Div
+local Icon = esper.Icon
+local omap = esper.omap
+local harbor = require("harbor")
+
+function FleetName(name)
+    return Div { name }
+        :style { bg = "black", color = "white", bold = true }
+        :layout { padding = 1, border = 1, border_style = "bracket", corner = "mediumshade" }
+end
+
+function Fleet(fleet)
+    local curr_buf = buffer:get_current()
+
+    return Div { omap(harbor.fleets[fleet]:get()):for_each(function(ship)
+            if ship == harbor.fleets.bay.EMPTY then return Icon("times") end
+            local is_active = ship.value and curr_buf.name == ship.value
+
+            return Div {
+                    is_active and Icon "react",
+                    ship.format_name and ship:format_name() or "Ship"
+                }
+                :layout { border = is_active and 1 or 0, padding = 1, corner = "angleup" }
+        end)
+        }:style { bg = "cyan", color = "black" }
+        :layout { gap = 2 }
+end
+
+function TabLine()
+    return Div {
+        FleetName "BAY",
+        Fleet "bay",
+        FleetName "DOCK",
+        Fleet "dock",
+    }:style { bg = "cyan" }
+end
+
 function harbor_lualine:setup()
+    vim.keymap.set("n", "<leader>r", function() esper.DevTool.open() end)
     local ext = function()
         local hl = get_active_highlight(true)
         local harbor = require("harbor")
         local bay_fleet = get_fleet("BAY", harbor.fleets.bay, { invert = false, show_history = false })
         local dock_fleet = get_fleet("DOCK", harbor.fleets.dock, { show_index = true, invert = false })
         return T({ bay_fleet }, { " " }, { " ||| ", hl.sep }, { " " }, { dock_fleet })
+        -- return "%#ErrorMsg#hello%#Normal#"
+        -- return vim.fn.escape(TabLine():render(), "%")
+        -- return TabLine():render()
+        -- local ok, str = pcall(function() return TabLine():render() end)
+        -- print(str)
+        -- return str
     end
 
     return ext

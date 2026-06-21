@@ -25,7 +25,7 @@ Fleet.__index = Fleet
 
 Fleet.buffer_adapter = buffer_adapter
 Fleet.win_adapter = window_adapter
-
+Fleet.EMPTY = EMPTY
 ---@param harbor Harbor
 ---@param name string
 ---@param length number
@@ -209,6 +209,7 @@ function Fleet:show(index, new_win)
     end
 
     self.active_ship = ship
+    self.harbor.active_ship = ship
     emitter:emit("SET_ACTIVE_SHIP", { fleet = self, ship = ship})
 end
 

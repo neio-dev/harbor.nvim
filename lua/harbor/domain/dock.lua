@@ -25,20 +25,20 @@ end
 ---@param _ship Ship
 ---@param index? number
 function Dock:set(_ship, index)
-    local fleet = Fleet.set(self, _ship, index)
-    if fleet.ship == nil or fleet.ship == EMPTY then return end
-    index = self:get_ship_index(fleet.ship and fleet.ship.value or nil)
-    vim.notify("Ship [" .. fleet.ship:format_name() .. "] docked to slot #" .. index)
+    local fleet_set_data = Fleet.set(self, _ship, index)
+    if fleet_set_data.ship == nil or fleet_set_data.ship == EMPTY then return end
+    index = self:get_ship_index(fleet_set_data.ship and fleet_set_data.ship.value or nil)
+    vim.notify("Ship [" .. fleet_set_data.ship:format_name() .. "] docked to slot #" .. index)
 
     local bay = self.harbor.fleets.bay
-    if bay ~= nil and fleet.ship ~= nil then
-        local bay_ship_index = bay:get_ship_index(fleet.ship.value)
+    if bay ~= nil and fleet_set_data.ship ~= nil then
+        local bay_ship_index = bay:get_ship_index(fleet_set_data.ship.value)
         if bay_ship_index ~= nil then
             bay:remove(bay_ship_index)
         end
 
-        if fleet.previous_ship ~= nil and fleet.previous_ship ~= EMPTY then
-            bay:set(fleet.previous_ship)
+        if fleet_set_data.previous_ship ~= nil and fleet_set_data.previous_ship ~= EMPTY then
+            bay:set(fleet_set_data.previous_ship)
         end
     end
 end

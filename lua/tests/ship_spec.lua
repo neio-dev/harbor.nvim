@@ -1,9 +1,5 @@
+require("tests.spec_helper")
 local Ship = require("harbor.domain.ship")
-local test_buffer_adapter = require("harbor.adapters.test_buffer_adapter")
-local test_window_adapter = require("harbor.adapters.test_window_adapter")
-
-Ship.buffer_adapter = test_buffer_adapter
-Ship.win_adapter = test_window_adapter
 
 describe("Ship:new", function()
     it("initializes with defaults", function()

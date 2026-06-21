@@ -18,6 +18,10 @@ function Ship:new(name, cursor_position, current_list)
         utils.error("name is required", ERROR_TYPES.ShipError)
     end
 
+    if cursor_position and not (cursor_position.row and cursor_position.col) then
+        cursor_position = { col = cursor_position[1], row = cursor_position[2] }
+    end
+
     if cursor_position and (cursor_position.row == 0) then cursor_position.row = 1 end
 
     local ship = setmetatable({

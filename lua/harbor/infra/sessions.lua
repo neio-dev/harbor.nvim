@@ -1,9 +1,11 @@
 local Ship = require("harbor.domain.ship")
 local utils = require("harbor.utils")
+local FileAdapter = require("harbor.adapters.file_adapter")
 
 ---@class SessionManager
 local SessionManager = {}
 SessionManager.__index = SessionManager
+SessionManager.file_adapter = FileAdapter
 
 ---@param harbor Harbor
 ---@return SessionManager
@@ -11,7 +13,7 @@ function SessionManager:new(harbor)
     local instance = setmetatable({
         sessions = {},
         path = vim.fn.getcwd(),
-        dir = vim.fn.stdpath("data") .. "/harbor",
+        dir = self.file_adapter.get_stdpath("data") .. "/harbor",
     }, self)
     instance.harbor = harbor
 
@@ -70,9 +72,9 @@ end
 ---@return SavedData?
 function SessionManager:get_session_data()
     local filepath = self:get_session_path()
-    if vim.fn.filereadable(filepath) == 0 then return nil end
+    if not self.file_adapter.file_exists(filepath) then return nil end
 
-    local lines = vim.fn.readfile(filepath)
+    local lines = self.file_adapter.read_file(filepath)
     if lines == nil then return nil end
 
     local json_string = table.concat(lines, "\n")
@@ -98,7 +100,7 @@ function SessionManager:save(name)
     end
 
     vim.fn.mkdir(self.dir, "p")
-    -- vim.fn.writefile({ json(new_data) }, filepath)
+    vim.fn.writefile({ json(new_data) }, filepath)
 end
 
 ---@return string
