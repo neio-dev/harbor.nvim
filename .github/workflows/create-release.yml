@@ -72,7 +72,6 @@ jobs:
             # Only handle commits that exist in dev
             if ! git merge-base --is-ancestor "$SHA" origin/dev
             then
-<<<<<<< Updated upstream
               echo "Reverting $TAG ($SHA)"
 
               # Merge commit?
@@ -84,11 +83,8 @@ jobs:
 
               git commit --amend -m "$(git log -1 --pretty=%B) preprod-revert"
             else
-              echo "Skipping $TAG"
-=======
               echo "Skipping $TAG (not in dev)"
               continue
->>>>>>> Stashed changes
             fi
 
             # Skip if already in main
