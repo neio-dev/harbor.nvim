@@ -32,11 +32,11 @@ jobs:
         id: release
         shell: bash
         run: |
-          LAST=$(git ls-remote --heads origin "release/*" \
+          LAST=$(git ls-remote --heads origin "refs/heads/release/*" 2>/dev/null \
             | awk -F'/' '{print $NF}' \
             | grep -E '^[0-9]+$' \
             | sort -n \
-            | tail -1)
+            | tail -1 || true)
 
           if [ -z "$LAST" ]; then
             NEXT=1
@@ -45,7 +45,8 @@ jobs:
           fi
 
           echo "branch=release/$NEXT" >> "$GITHUB_OUTPUT"
-
+          echo "Creating release branch: release/$NEXT"
+      
       - name: Create release branch from dev
         run: |
           git checkout dev
