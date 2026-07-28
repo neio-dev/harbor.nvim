@@ -57,47 +57,29 @@ jobs:
         shell: bash
         run: |
           TAGS=$(git tag -l "no-prod/*")
-
           if [ -z "$TAGS" ]; then
             echo "No no-prod tags found."
             exit 0
           fi
-
           for TAG in $TAGS
           do
             SHA=$(git rev-list -n 1 "$TAG")
-
             echo "Processing $TAG -> $SHA"
 
             # Only handle commits that exist in dev
-            if ! git merge-base --is-ancestor "$SHA" origin/dev
-            then
-              echo "Reverting $TAG ($SHA)"
-
-              # Merge commit?
-              if [ "$(git rev-list --parents -n 1 "$SHA" | wc -w)" -gt 2 ]; then
-                git revert -m 1 --no-edit "$SHA"
-              else
-                git revert --no-edit "$SHA"
-              fi
-
-              git commit --amend -m "$(git log -1 --pretty=%B) preprod-revert"
-            else
+            if ! git merge-base --is-ancestor "$SHA" origin/dev; then
               echo "Skipping $TAG (not in dev)"
               continue
             fi
 
             # Skip if already in main
-            if git merge-base --is-ancestor "$SHA" origin/main
-            then
+            if git merge-base --is-ancestor "$SHA" origin/main; then
               echo "Skipping $TAG (already in main)"
               continue
             fi
 
             echo "Reverting $SHA"
-
             PARENT_COUNT=$(git rev-list --parents -n 1 "$SHA" | wc -w)
-
             if [ "$PARENT_COUNT" -gt 2 ]; then
               echo "Merge commit detected"
               git revert -m 1 --no-edit "$SHA"
@@ -105,7 +87,6 @@ jobs:
               echo "Normal commit detected"
               git revert --no-edit "$SHA"
             fi
-
             git commit --amend -m "$(git log -1 --pretty=%B) preprod-revert: $TAG"
           done
 
