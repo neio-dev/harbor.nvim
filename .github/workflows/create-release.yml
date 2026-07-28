@@ -54,6 +54,8 @@ jobs:
           git checkout -b "${{ steps.release.outputs.branch }}"
 
             - name: Revert all no-prod tags
+
+      - name: Revert all no-prods tags
         shell: bash
         run: |
           TAGS=$(git tag -l "no-prod/*")
