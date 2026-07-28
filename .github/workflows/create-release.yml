@@ -1,0 +1,102 @@
+name: Create Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch latest refs
+        run: |
+          git fetch origin --prune
+          git fetch --tags --force
+
+      - name: Determine next release branch
+        id: release
+        shell: bash
+        run: |
+          LAST=$(git ls-remote --heads origin "release/*" \
+            | awk -F'/' '{print $NF}' \
+            | grep -E '^[0-9]+$' \
+            | sort -n \
+            | tail -1)
+
+          if [ -z "$LAST" ]; then
+            NEXT=1
+          else
+            NEXT=$((LAST + 1))
+          fi
+
+          echo "branch=release/$NEXT" >> "$GITHUB_OUTPUT"
+
+      - name: Create release branch from dev
+        run: |
+          git checkout dev
+          git pull origin dev
+          git checkout -b "${{ steps.release.outputs.branch }}"
+
+      - name: Revert all no-prod tags
+        shell: bash
+        run: |
+          TAGS=$(git tag -l "no-prod/*")
+
+          if [ -z "$TAGS" ]; then
+            echo "No no-prod tags found."
+            exit 0
+          fi
+
+          echo "$TAGS" | while read TAG
+          do
+            SHA=$(git rev-list -n 1 "$TAG")
+
+            # Only revert commits that are in dev but not yet in master
+            if git merge-base --is-ancestor "$SHA" origin/dev &&
+               ! git merge-base --is-ancestor "$SHA" origin/master
+            then
+              echo "Reverting $TAG ($SHA)"
+
+              # Merge commit?
+              if [ "$(git rev-list --parents -n 1 "$SHA" | wc -w)" -gt 2 ]; then
+                git revert -m 1 --no-edit "$SHA"
+              else
+                git revert --no-edit "$SHA"
+              fi
+
+              git commit --amend -m "$(git log -1 --pretty=%B)
+
+preprod-revert"
+            else
+              echo "Skipping $TAG"
+            fi
+          done
+
+      - name: Push release branch
+        run: |
+          git push --set-upstream origin "${{ steps.release.outputs.branch }}"
+
+      - name: Create Pull Request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr create \
+            --base master \
+            --head "${{ steps.release.outputs.branch }}" \
+            --title "Release ${{ steps.release.outputs.branch }}" \
+            --body "Automatically generated release branch."
