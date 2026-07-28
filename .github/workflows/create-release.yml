@@ -53,7 +53,7 @@ jobs:
           git pull origin dev
           git checkout -b "${{ steps.release.outputs.branch }}"
 
-      - name: Revert all no-prod tags
+            - name: Revert all no-prod tags
         shell: bash
         run: |
           TAGS=$(git tag -l "no-prod/*")
@@ -63,14 +63,16 @@ jobs:
             exit 0
           fi
 
-          echo "$TAGS" | while read TAG
+          for TAG in $TAGS
           do
             SHA=$(git rev-list -n 1 "$TAG")
 
-            # Only revert commits that are in dev but not yet in master
-            if git merge-base --is-ancestor "$SHA" origin/dev &&
-               ! git merge-base --is-ancestor "$SHA" origin/master
+            echo "Processing $TAG -> $SHA"
+
+            # Only handle commits that exist in dev
+            if ! git merge-base --is-ancestor "$SHA" origin/dev
             then
+<<<<<<< Updated upstream
               echo "Reverting $TAG ($SHA)"
 
               # Merge commit?
@@ -83,7 +85,32 @@ jobs:
               git commit --amend -m "$(git log -1 --pretty=%B) preprod-revert"
             else
               echo "Skipping $TAG"
+=======
+              echo "Skipping $TAG (not in dev)"
+              continue
+>>>>>>> Stashed changes
             fi
+
+            # Skip if already in main
+            if git merge-base --is-ancestor "$SHA" origin/main
+            then
+              echo "Skipping $TAG (already in main)"
+              continue
+            fi
+
+            echo "Reverting $SHA"
+
+            PARENT_COUNT=$(git rev-list --parents -n 1 "$SHA" | wc -w)
+
+            if [ "$PARENT_COUNT" -gt 2 ]; then
+              echo "Merge commit detected"
+              git revert -m 1 --no-edit "$SHA"
+            else
+              echo "Normal commit detected"
+              git revert --no-edit "$SHA"
+            fi
+
+            git commit --amend -m "$(git log -1 --pretty=%B) preprod-revert: $TAG"
           done
 
       - name: Push release branch
